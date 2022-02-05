@@ -69,6 +69,15 @@ write_position(uint8_t *buf, const struct sc_position *position) {
     buffer_write16be(&buf[10], position->screen_size.height);
 }
 
+static struct sc_position read_position(uint8_t *buf) {
+    struct sc_position position;
+    position.point.x = buffer_read32be(&buf[0]);
+    position.point.y = buffer_read32be(&buf[4]);
+    position.screen_size.width = buffer_read16be(&buf[8]);
+    position.screen_size.height = buffer_read16be(&buf[10]);
+    return position;
+}
+
 // write length (2 bytes) + string (non nul-terminated)
 static size_t
 write_string(const char *utf8, size_t max_len, unsigned char *buf) {
@@ -86,6 +95,11 @@ to_fixed_point_16(float f) {
         u = 0xffff;
     }
     return (uint16_t) u;
+}
+
+static float
+from_fixed_point_16(uint16_t u) {
+    return (float)(u) / 0x1p16f;
 }
 
 size_t
@@ -147,6 +161,20 @@ control_msg_serialize(const struct control_msg *msg, unsigned char *buf) {
             LOGW("Unknown message type: %u", (unsigned) msg->type);
             return 0;
     }
+}
+
+bool control_msg_deserialize(unsigned char *buf, struct control_msg *msg) {
+    msg->type = buf[0];
+    switch (buf[0]) {
+        case CONTROL_MSG_TYPE_INJECT_TOUCH_EVENT:
+            msg->inject_touch_event.action = buf[1];
+            msg->inject_touch_event.pointer_id = buffer_read64be(&buf[2]);
+            msg->inject_touch_event.position = read_position(&buf[10]);
+            msg->inject_touch_event.pressure = from_fixed_point_16(buffer_read16be(&buf[22]));
+            msg->inject_touch_event.buttons = buffer_read32be(&buf[24]);
+            break;
+    }
+    return true;
 }
 
 void

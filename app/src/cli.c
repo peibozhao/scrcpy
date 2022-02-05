@@ -52,6 +52,8 @@
 #define OPT_NO_CLIPBOARD_AUTOSYNC  1032
 #define OPT_TCPIP                  1033
 #define OPT_RAW_KEY_EVENTS         1034
+#define OPT_FORWARD_PORT           2000
+#define OPT_REMOTE_CONTROL_PORT    2001
 
 struct sc_option {
     char shortopt;
@@ -470,6 +472,20 @@ static const struct sc_option options[] = {
         .argdesc = "value",
         .text = "Set the initial window height.\n"
                 "Default is 0 (automatic).",
+    },
+    {
+        .longopt_id = OPT_FORWARD_PORT,
+        .longopt = "forward-port",
+        .argdesc = "value",
+        .optional_arg = false,
+        .text = "Forwarding frame to third user.\n"
+    },
+    {
+        .longopt_id = OPT_REMOTE_CONTROL_PORT,
+        .longopt = "remote-control-port",
+        .argdesc = "value",
+        .optional_arg = false,
+        .text = "Control message from third user.\n"
     },
 };
 
@@ -1421,6 +1437,16 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
                 opts->tcpip = true;
                 opts->tcpip_dst = optarg;
                 break;
+            case OPT_FORWARD_PORT:
+                if (!parse_port(optarg, &opts->forward_port)) {
+                    return false;
+                }
+                break;
+            case OPT_REMOTE_CONTROL_PORT:
+                if (!parse_port(optarg, &opts->remote_control_port)) {
+                    return false;
+                }
+                break;
 #ifdef HAVE_V4L2
             case OPT_V4L2_SINK:
                 opts->v4l2_device = optarg;
@@ -1452,9 +1478,11 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
     }
 
 #ifdef HAVE_V4L2
-    if (!opts->display && !opts->record_filename && !opts->v4l2_device) {
+    if (!opts->display && !opts->record_filename && !opts->v4l2_device &&
+        opts->forward_port == 0) {
         LOGE("-N/--no-display requires either screen recording (-r/--record)"
-             " or sink to v4l2loopback device (--v4l2-sink)");
+             " or sink to v4l2loopback device (--v4l2-sink) or "
+             "forward(--forward-port)");
         return false;
     }
 
@@ -1470,8 +1498,9 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
         return false;
     }
 #else
-    if (!opts->display && !opts->record_filename) {
-        LOGE("-N/--no-display requires screen recording (-r/--record)");
+    if (!opts->display && !opts->record_filename && opts->forward_port == 0) {
+        LOGE("-N/--no-display requires screen recording (-r/--record) or "
+             "forward(--forward-port)");
         return false;
     }
 #endif

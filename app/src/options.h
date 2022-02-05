@@ -125,6 +125,8 @@ struct scrcpy_options {
     bool clipboard_autosync;
     bool tcpip;
     const char *tcpip_dst;
+    uint16_t forward_port;
+    uint16_t remote_control_port;
 };
 
 extern const struct scrcpy_options scrcpy_options_default;

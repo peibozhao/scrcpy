@@ -25,6 +25,8 @@
 #include "mouse_inject.h"
 #include "recorder.h"
 #include "screen.h"
+#include "forward.h"
+#include "remote_control.h"
 #include "server.h"
 #include "stream.h"
 #include "util/acksync.h"
@@ -37,6 +39,8 @@
 struct scrcpy {
     struct sc_server server;
     struct screen screen;
+    struct forward forward;
+    struct remote_control remote_control;
     struct stream stream;
     struct decoder decoder;
     struct recorder recorder;
@@ -512,6 +516,19 @@ scrcpy(struct scrcpy_options *options) {
         decoder_add_sink(&s->decoder, &s->screen.frame_sink);
     }
 
+    if (options->forward_port > 0) {
+        struct forward_params forward_params = {
+            .port = options->forward_port,
+        };
+        if (!forward_init(&s->forward, &forward_params)) {
+            goto end;
+        }
+        decoder_add_sink(&s->decoder, &s->forward.frame_sink);
+        if (!forward_start(&s->forward)) {
+            goto end;
+        }
+    }
+
 #ifdef HAVE_V4L2
     if (options->v4l2_device) {
         if (!sc_v4l2_sink_init(&s->v4l2_sink, options->v4l2_device,
@@ -589,6 +606,20 @@ aoa_hid_end:
 
     input_manager_init(&s->input_manager, &s->controller, &s->screen, kp, mp,
                        options);
+
+    if (options->remote_control_port > 0) {
+        struct remote_control_params remote_control_params = {
+            .port = options->remote_control_port,
+            .controller = &s->controller,
+            .input_manager = &s->input_manager,
+        };
+        if (!remote_control_init(&s->remote_control, &remote_control_params)) {
+            goto end;
+        }
+        if (!remote_control_start(&s->remote_control)) {
+            goto end;
+        }
+    }
 
     ret = event_loop(s, options);
     LOGD("quit...");

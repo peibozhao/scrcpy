@@ -94,6 +94,8 @@ struct control_msg {
 size_t
 control_msg_serialize(const struct control_msg *msg, unsigned char *buf);
 
+bool control_msg_deserialize(unsigned char *buf, struct control_msg *msg);
+
 void
 control_msg_log(const struct control_msg *msg);
 
