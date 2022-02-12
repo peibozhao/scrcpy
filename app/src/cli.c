@@ -1441,11 +1441,13 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
                 if (!parse_port(optarg, &opts->forward_port)) {
                     return false;
                 }
+                opts->forward = true;
                 break;
             case OPT_REMOTE_CONTROL_PORT:
                 if (!parse_port(optarg, &opts->remote_control_port)) {
                     return false;
                 }
+                opts->remote_control = true;
                 break;
 #ifdef HAVE_V4L2
             case OPT_V4L2_SINK:

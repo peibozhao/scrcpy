@@ -420,7 +420,7 @@ scrcpy(struct scrcpy_options *options) {
     }
 
     struct decoder *dec = NULL;
-    bool needs_decoder = options->display;
+    bool needs_decoder = options->display || options->forward;
 #ifdef HAVE_V4L2
     needs_decoder |= !!options->v4l2_device;
 #endif
@@ -516,7 +516,7 @@ scrcpy(struct scrcpy_options *options) {
         decoder_add_sink(&s->decoder, &s->screen.frame_sink);
     }
 
-    if (options->forward_port > 0) {
+    if (options->forward > 0) {
         struct forward_params forward_params = {
             .port = options->forward_port,
         };
@@ -607,11 +607,12 @@ aoa_hid_end:
     input_manager_init(&s->input_manager, &s->controller, &s->screen, kp, mp,
                        options);
 
-    if (options->remote_control_port > 0) {
+    if (options->remote_control) {
         struct remote_control_params remote_control_params = {
             .port = options->remote_control_port,
             .controller = &s->controller,
-            .input_manager = &s->input_manager,
+            .width = info->frame_size.width,
+            .height = info->frame_size.height,
         };
         if (!remote_control_init(&s->remote_control, &remote_control_params)) {
             goto end;

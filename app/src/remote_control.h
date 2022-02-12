@@ -10,14 +10,15 @@
 #define REMOTE_MAX_CONNECTION 1
 
 struct remote_control {
-    struct input_manager *input_manager;
+    struct sc_size screen_size;
     struct controller *controller;
     sc_socket socket;
     sc_thread thread;
 };
 
 struct remote_control_params {
-    struct input_manager *input_manager;
+    uint16_t width;
+    uint16_t height;
     struct controller *controller;
     uint16_t port;
 };

@@ -56,6 +56,8 @@ const struct scrcpy_options scrcpy_options_default = {
     .clipboard_autosync = true,
     .tcpip = false,
     .tcpip_dst = NULL,
+    .forward = false,
     .forward_port = 0,
+    .remote_control = false,
     .remote_control_port = 0,
 };
