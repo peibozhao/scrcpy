@@ -617,6 +617,7 @@ aoa_hid_end:
         if (!remote_control_init(&s->remote_control, &remote_control_params)) {
             goto end;
         }
+        decoder_add_sink(&s->decoder, &s->remote_control.frame_sink);
         if (!remote_control_start(&s->remote_control)) {
             goto end;
         }

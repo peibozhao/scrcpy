@@ -6,6 +6,7 @@
 #include "input_manager.h"
 #include "util/net.h"
 #include "util/thread.h"
+#include "trait/frame_sink.h"
 
 #define REMOTE_MAX_CONNECTION 1
 
@@ -14,6 +15,7 @@ struct remote_control {
     struct controller *controller;
     sc_socket socket;
     sc_thread thread;
+    struct sc_frame_sink frame_sink;
 };
 
 struct remote_control_params {
