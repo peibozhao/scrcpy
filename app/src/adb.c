@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "adb_parser.h"
 #include "util/file.h"
@@ -360,6 +361,7 @@ adb_connect(struct sc_intr *intr, const char *ip_port, unsigned flags) {
         sc_str_truncate(buf, r, "\r\n");
         fprintf(stderr, "%s\n", buf);
     }
+    usleep(100000);
     return ok;
 }
 
