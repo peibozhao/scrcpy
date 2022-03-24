@@ -100,7 +100,7 @@ bool forward_init(struct forward *forward,
         return false;
     }
     forward->connection_count = 0;
-    assert(sc_mutex_init(&forward->mutex));
+    sc_mutex_init(&forward->mutex);
     return true;
 }
 

@@ -29,7 +29,7 @@ static int run_remote_control(void *data) {
             }
 
             struct control_msg msg;
-            assert(control_msg_deserialize(buf, &msg));
+            control_msg_deserialize(buf, &msg);
             msg.inject_touch_event.buttons = AMOTION_EVENT_BUTTON_PRIMARY;
             msg.inject_touch_event.pointer_id = POINTER_ID_MOUSE;
             msg.inject_touch_event.position.screen_size =
@@ -37,7 +37,7 @@ static int run_remote_control(void *data) {
             msg.inject_touch_event.pressure =
                 msg.inject_touch_event.action == AMOTION_EVENT_ACTION_DOWN ? 0
                                                                            : 1;
-            assert(controller_push_msg(remote_control->controller, &msg));
+            controller_push_msg(remote_control->controller, &msg);
         }
     }
     free(buf);
