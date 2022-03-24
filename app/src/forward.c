@@ -96,7 +96,7 @@ bool forward_init(struct forward *forward,
     forward->frame_sink.ops = &ops;
     forward->socket = net_socket();
     LOGD("Forward listen on %d", params->port);
-    if (!net_listen(forward->socket, IPV4_LOCALHOST, params->port, 2)) {
+    if (!net_listen(forward->socket, INADDR_ANY, params->port, 2)) {
         return false;
     }
     forward->connection_count = 0;

@@ -2,6 +2,7 @@
 #include "util/buffer_util.h"
 #include "util/log.h"
 #include <assert.h>
+#include <netinet/in.h>
 
 #define DOWNCAST(SINK) container_of(SINK, struct remote_control, frame_sink)
 
@@ -66,7 +67,7 @@ bool remote_control_init(struct remote_control *remote_control,
     remote_control->screen_size.height = params->height;
     remote_control->socket = net_socket();
     LOGD("Remote control listen on %d", params->port);
-    if (!net_listen(remote_control->socket, IPV4_LOCALHOST, params->port, 2)) {
+    if (!net_listen(remote_control->socket, INADDR_ANY, params->port, 2)) {
         return false;
     }
     static const struct sc_frame_sink_ops ops = {
