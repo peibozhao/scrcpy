@@ -10,6 +10,7 @@ static int run_remote_control(void *data) {
     uint8_t *buf = malloc(CONTROL_MSG_MAX_SIZE);
     while (true) {
         sc_socket connection_socket = net_accept(remote_control->socket);
+        LOGI("Remote control accept connect");
         while (true) {
             ssize_t recv_len = 0;
             recv_len = net_recv_all(connection_socket, buf, 4);

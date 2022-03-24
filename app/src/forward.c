@@ -51,6 +51,7 @@ static bool forward_frame_sink_push(struct sc_frame_sink *sink,
                 forward->connection[i - 1] = forward->connection[i];
             }
             forward->connection_count -= 1;
+            LOGI("Forward close connect");
             break;
         } else {
             connection_idx += 1;
@@ -78,6 +79,7 @@ static int run_forward(void *data) {
         sc_mutex_lock(&forward->mutex);
         forward->connection[forward->connection_count] = connection_socket;
         forward->connection_count += 1;
+        LOGI("Forward accept connect");
         sc_mutex_unlock(&forward->mutex);
     }
     return 0;
